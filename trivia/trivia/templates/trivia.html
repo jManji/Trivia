@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="master.html" />
+
+  <head>
+    <title>Learning TurboGears 2.3: Quick guide to the Quickstart pages.</title>
+    <!-- <script type="text/javascript" src="${tg.url('/static/javascript/user.js')}"/> -->
+  </head>
+
+  <body>
+    <li>
+        <h3>${trivia['q_text']}</h3>
+    <div>
+        <input type="radio" name="question-1-answers" id="question-1-answers-A" value="A" />
+        <label for="question-1-answers-A">A) ${trivia['q_options_1']} </label>
+    </div>
+    <div>
+        <input type="radio" name="question-1-answers" id="question-1-answers-B" value="B" />
+        <label for="question-1-answers-B">B) ${trivia['q_options_2']}</label>
+    </div>
+    <div>
+        <input type="radio" name="question-1-answers" id="question-1-answers-C" value="C" />
+        <label for="question-1-answers-C">C) ${trivia['q_options_3']}</label>
+    </div>
+    <div>
+        <input type="radio" name="question-1-answers" id="question-1-answers-D" value="D" />
+        <label for="question-1-answers-D">D) ${trivia['q_options_4']}</label>
+    </div>
+
+</li>
+  </body>
+</html>

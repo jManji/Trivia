@@ -1,0 +1,4 @@
+recursive-include trivia/public *
+include trivia/public/favicon.ico
+recursive-include trivia/i18n *
+recursive-include trivia/templates *
