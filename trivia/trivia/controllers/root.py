@@ -17,6 +17,8 @@ from trivia.controllers.error import ErrorController
 
 from questiongenerator import QuestionGenerator
 
+from genshi import Stream
+
 __all__ = ['RootController']
 
 
@@ -40,6 +42,7 @@ class RootController(BaseController):
     error = ErrorController()
     
     question_generator = QuestionGenerator()
+    
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "trivia"
@@ -48,7 +51,9 @@ class RootController(BaseController):
     def index(self):
         """Handle the front-page."""
         generated_trivia = self.question_generator.get_question()
-        #return 'test'
+        
+        print 'option1 ' + generated_trivia['option_1']
+        
         return dict(trivia=generated_trivia)
 
     @expose('trivia.templates.about')

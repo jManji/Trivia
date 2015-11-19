@@ -44,8 +44,8 @@ install_requires = [
     "tw2.forms",
     "tgext.admin >= 0.6.1",
     "WebHelpers2",
-	"requests",
-	"unirest"
+    "requests",
+    "unirest"
 ]
 
 if py_version != (3, 2):

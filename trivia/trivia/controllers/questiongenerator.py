@@ -5,10 +5,13 @@ import requests
 import unirest
 import tw2.core
 
+from HTMLParser import HTMLParser
+from email.generator import DecodedGenerator
+
 class QuestionGenerator(object):
     
     #resources = [tw2.core.CSSLink(link='/css/trivia.css')]
-    
+    html_parser = HTMLParser()
     
     def get_question(self):
             #response = requests.get('https://pareshchouhan-trivia-v1.p.mashape.com/v1/getAllQuizQuestions')
@@ -18,4 +21,10 @@ class QuestionGenerator(object):
                 "Accept": "application/json"
               }
             )
-            return response.body
+
+            return {'question': self.html_parser.unescape(response.body['q_text']),
+                    'option_1': self.html_parser.unescape(response.body)['q_options_1'],
+                    'option_2': self.html_parser.unescape(response.body)['q_options_2'],
+                    'option_3': self.html_parser.unescape(response.body)['q_options_3'],
+                    'option_4': self.html_parser.unescape(response.body)['q_options_4'],
+                    }

@@ -1,6 +1,6 @@
-[gearbox.plugins]
-turbogears-devtools = tg.devtools
-
 [paste.app_factory]
 main = trivia.config.middleware:make_app
+
+[gearbox.plugins]
+turbogears-devtools = tg.devtools
 
