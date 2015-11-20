@@ -1,9 +1,11 @@
 *~
 *.egg-info
 *.mak.py
-*.pyc
+*.pycgit
 *.pyo
+*.pyc
 .project
 .pydevproject
 *.db
 *.swp
+.settings
