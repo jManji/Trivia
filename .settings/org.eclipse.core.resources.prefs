@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
 encoding//trivia/setup.py=utf-8
+encoding//trivia/trivia/config/app_cfg.py=utf-8
 encoding//trivia/trivia/controllers/questiongenerator.py=utf-8
 encoding//trivia/trivia/controllers/root.py=utf-8
+encoding//trivia/trivia/websetup/bootstrap.py=utf-8

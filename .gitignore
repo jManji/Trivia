@@ -5,3 +5,5 @@
 *.pyo
 .project
 .pydevproject
+*.db
+*.swp
