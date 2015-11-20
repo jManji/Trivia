@@ -16,8 +16,7 @@ from trivia.lib.base import BaseController
 from trivia.controllers.error import ErrorController
 
 from questiongenerator import QuestionGenerator
-
-from genshi import Stream
+from repoze.what.predicates import is_anonymous
 
 __all__ = ['RootController']
 
@@ -42,19 +41,45 @@ class RootController(BaseController):
     error = ErrorController()
     
     question_generator = QuestionGenerator()
-    
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "trivia"
 
+    @expose('trivia.templates.register')
+    @require(is_anonymous(msg='Only one account per user is allowed'))
+    def register(self):
+        """Display the user registration form"""
+        return {'page': 'user registration'}
+    
+    @expose()
+    @require(is_anonymous(msg='Only one account per user is ' \
+                              'allowed'))
+    def add_user(self, username, email, passwd):
+        # Defining the row
+        user = model.User()
+        user.user_name = username
+        user.email_address = email
+        user.password = passwd
+
+        # Saving the row:
+        DBSession.add(user)
+        # Redirecting to the login form with a notification
+        # message:
+        flash('Account created! Please log in')
+        redirect(url('/login'))
+
     @expose('trivia.templates.trivia')
     def index(self):
         """Handle the front-page."""
-        generated_trivia = self.question_generator.get_question()
         
-        print 'option1 ' + generated_trivia['option_1']
+        if request.identity:
+            generated_trivia = self.question_generator.get_question()
         
-        return dict(trivia=generated_trivia)
+            print 'option 1 ' + generated_trivia['option_1']
+        
+            return dict(trivia=generated_trivia)
+        else:
+            redirect(url('/login'))
 
     @expose('trivia.templates.about')
     def about(self):
@@ -114,8 +139,8 @@ class RootController(BaseController):
             login_counter = request.environ.get('repoze.who.logins', 0) + 1
             redirect('/login',
                      params=dict(came_from=came_from, __logins=login_counter))
-        userid = request.identity['repoze.who.userid']
-        flash(_('Welcome back, %s!') % userid)
+#         userid = request.identity['repoze.who.userid']
+#         flash(_('Welcome back, %s!') % userid)
 
         # Do not use tg.redirect with tg.url as it will add the mountpoint
         # of the application twice.
@@ -130,3 +155,10 @@ class RootController(BaseController):
         """
         flash(_('We hope to see you soon!'))
         return HTTPFound(location=came_from)
+
+
+    @expose()
+    def logout(self):
+        identity.current.logout()
+
+        raise redirect('/')
