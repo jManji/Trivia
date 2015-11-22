@@ -18,6 +18,8 @@ from trivia.controllers.error import ErrorController
 from questiongenerator import QuestionGenerator
 from repoze.what.predicates import is_anonymous
 
+import transaction
+
 __all__ = ['RootController']
 
 
@@ -50,7 +52,16 @@ class RootController(BaseController):
     def register(self):
         """Display the user registration form"""
         return {'page': 'user registration'}
-    
+
+    @expose()
+    def submit_answer(self, options):
+        
+        # Assume it's always correct for now
+        DBSession.query(model.User).filter_by(email_address=request.\
+                                              identity['user'].email_address).\
+                                              update({'score': model.User.score + 1})
+        transaction.commit()
+
     @expose()
     @require(is_anonymous(msg='Only one account per user is ' \
                               'allowed'))

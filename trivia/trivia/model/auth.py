@@ -38,8 +38,8 @@ group_permission_table = Table('tg_group_permission', metadata,
 # This is the association table for the many-to-many relationship between
 # groups and members - this is, the memberships.
 user_group_table = Table('tg_user_group', metadata,
-                         Column('user_id', Integer,
-                                ForeignKey('tg_user.user_id',
+                         Column('email_address', Unicode(255),
+                                ForeignKey('tg_user.email_address',
                                            onupdate="CASCADE",
                                            ondelete="CASCADE"),
                                 primary_key=True),
@@ -83,12 +83,13 @@ class User(DeclarativeBase):
     """
     __tablename__ = 'tg_user'
 
-    user_id = Column(Integer, autoincrement=True, primary_key=True)
+    #user_id = Column(Integer, autoincrement=True, primary_key=True)
+    email_address = Column(Unicode(255), primary_key=True, nullable=False)
     user_name = Column(Unicode(16), unique=True, nullable=False)
-    email_address = Column(Unicode(255), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     _password = Column('password', Unicode(128))
     created = Column(DateTime, default=datetime.now)
+    score = Column(Integer, default = 0)
 
     def __repr__(self):
         return '<User: name=%s, email=%s, display=%s>' % (

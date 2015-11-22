@@ -45,7 +45,8 @@ install_requires = [
     "tgext.admin >= 0.6.1",
     "WebHelpers2",
     "requests",
-    "unirest"
+    "unirest",
+    "psycopg2"
 ]
 
 if py_version != (3, 2):
