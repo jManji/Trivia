@@ -27,4 +27,5 @@ class QuestionGenerator(object):
                     'option_2': self.html_parser.unescape(response.body)['q_options_2'],
                     'option_3': self.html_parser.unescape(response.body)['q_options_3'],
                     'option_4': self.html_parser.unescape(response.body)['q_options_4'],
+                    'correct_option': self.html_parser.unescape(response.body)['q_correct_option']
                     }

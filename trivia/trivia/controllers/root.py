@@ -43,6 +43,7 @@ class RootController(BaseController):
     error = ErrorController()
     
     question_generator = QuestionGenerator()
+    correct_option = 0
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "trivia"
@@ -55,12 +56,15 @@ class RootController(BaseController):
 
     @expose()
     def submit_answer(self, options):
-        
-        # Assume it's always correct for now
-        DBSession.query(model.User).filter_by(email_address=request.\
-                                              identity['user'].email_address).\
-                                              update({'score': model.User.score + 1})
-        transaction.commit()
+
+        if int(options) == self.correct_option:
+            # Assume it's always correct for now
+            DBSession.query(model.User).filter_by(email_address=request.\
+                                        identity['user'].email_address).\
+                                        update({'score': model.User.score + 1})
+            transaction.commit()
+
+        redirect(url('/'))
 
     @expose()
     @require(is_anonymous(msg='Only one account per user is ' \
@@ -82,11 +86,13 @@ class RootController(BaseController):
     @expose('trivia.templates.trivia')
     def index(self):
         """Handle the front-page."""
+        self.correct_option = 0
         
         if request.identity:
             generated_trivia = self.question_generator.get_question()
+            self.correct_option = generated_trivia['correct_option']
         
-            print 'option 1 ' + generated_trivia['option_1']
+            print '***** self.correct_option ', self.correct_option
         
             return dict(trivia=generated_trivia)
         else:
