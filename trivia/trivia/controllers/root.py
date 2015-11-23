@@ -57,14 +57,16 @@ class RootController(BaseController):
     @expose()
     def submit_answer(self, options):
 
+        found = False
         if int(options) == self.correct_option:
             # Assume it's always correct for now
             DBSession.query(model.User).filter_by(email_address=request.\
                                         identity['user'].email_address).\
                                         update({'score': model.User.score + 1})
             transaction.commit()
-
-        redirect(url('/'))
+            found = True
+        
+        redirect('/', params={'found': found})
 
     @expose()
     @require(is_anonymous(msg='Only one account per user is ' \
@@ -84,17 +86,24 @@ class RootController(BaseController):
         redirect(url('/login'))
 
     @expose('trivia.templates.trivia')
-    def index(self):
+    def index(self, found = None):
         """Handle the front-page."""
+        
+        # Default the correct option
         self.correct_option = 0
         
         if request.identity:
             generated_trivia = self.question_generator.get_question()
             self.correct_option = generated_trivia['correct_option']
-        
-            print '***** self.correct_option ', self.correct_option
-        
-            return dict(trivia=generated_trivia)
+            score =  DBSession.query(model.User).get(request.identity['user']\
+                                                .email_address).score
+
+            if found == 'True':
+                flash('Correct!', 'ok')
+            elif found == 'False':
+                flash('Wrong!', 'error')
+                                                
+            return { 'trivia': generated_trivia, 'score': score }
         else:
             redirect(url('/login'))
 
