@@ -1,7 +1,8 @@
 
 
 class Cache(object):
-    
+    """Caches the correct answer per question."""
+
     def __init__(self):
         self.cache = {}
         

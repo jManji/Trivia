@@ -6,6 +6,7 @@ from tg import request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg.exceptions import HTTPFound
 from tg import predicates
+from tg import session
 from trivia import model
 from trivia.controllers.secure import SecureController
 from trivia.model import DBSession
@@ -59,18 +60,20 @@ class RootController(BaseController):
     def submit_answer(self, options, question_id):
 
         correct_option = self.cache.get(int(question_id))
-        
-        found = False
-        
+
         if int(options) == correct_option: 
             # Assume it's always correct for now
             DBSession.query(model.User).filter_by(email_address=request.\
                                         identity['user'].email_address).\
                                         update({'score': model.User.score + 1})
             transaction.commit()
-            found = True
-        
-        redirect('/', params={'correct_answer': found})
+            session['answered_correctly'] = True
+            session.save()
+        else:
+            session['answered_correctly'] = False
+
+        session.save()
+        redirect(url('/'))
 
     @expose()
     @require(is_anonymous(msg='Only one account per user is ' \
@@ -90,21 +93,22 @@ class RootController(BaseController):
         redirect(url('/login'))
 
     @expose('trivia.templates.trivia')
-    def index(self, correct_answer = None):
+    def index(self):
         """Handle the front-page."""
-        
+
+
         if request.identity:
             generated_trivia = self.question_generator.get_question()
             self.cache.put(generated_trivia)
             score =  DBSession.query(model.User).get(request.identity['user']\
                                                 .email_address).score
 
-            if correct_answer == 'True':
-                flash('Correct!', 'ok')
-            elif correct_answer == 'False':
-                flash('Wrong!', 'error')
-                                                
-            return { 'trivia': generated_trivia, 'score': score }
+            answered_correctly = session.pop('answered_correctly', None)
+            session.save()
+
+            return { 'trivia': generated_trivia,
+                     'score': score,
+                     'answered_correctly': answered_correctly}
         else:
             redirect(url('/login'))
 

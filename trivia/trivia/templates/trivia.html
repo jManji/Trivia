@@ -9,6 +9,11 @@
   </head>
 
   <body>
+    <div py:choose="answered_correctly">
+        <div py:when="True">Correct!</div>
+        <div py:when="False">Wrong!</div>
+    </div>
+
     <form action="${tg.url('/submit_answer')}" method="post">
     
         <h3>${Markup(trivia['question'])}</h3>
@@ -31,9 +36,6 @@
     <input type="hidden" name="question_id" value="${trivia['id']}" />
     <input type="submit" value="Submit" id="submit" />
     </form>
-    
-    <div> Score: 
-        ${score}
-    </div>
+    <div>Score: ${score} </div>
   </body>
 </html>
