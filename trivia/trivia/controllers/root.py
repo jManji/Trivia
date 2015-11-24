@@ -15,8 +15,9 @@ from tgext.admin.controller import AdminController
 from trivia.lib.base import BaseController
 from trivia.controllers.error import ErrorController
 
-from questiongenerator import QuestionGenerator
+from question_generator import QuestionGenerator
 from repoze.what.predicates import is_anonymous
+from cache import Cache
 
 import transaction
 
@@ -43,7 +44,7 @@ class RootController(BaseController):
     error = ErrorController()
     
     question_generator = QuestionGenerator()
-    correct_option = 0
+    cache = Cache()
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "trivia"
@@ -55,10 +56,13 @@ class RootController(BaseController):
         return {'page': 'user registration'}
 
     @expose()
-    def submit_answer(self, options):
+    def submit_answer(self, options, question_id):
 
+        correct_option = self.cache.get(int(question_id))
+        
         found = False
-        if int(options) == self.correct_option:
+        
+        if int(options) == correct_option: 
             # Assume it's always correct for now
             DBSession.query(model.User).filter_by(email_address=request.\
                                         identity['user'].email_address).\
@@ -66,7 +70,7 @@ class RootController(BaseController):
             transaction.commit()
             found = True
         
-        redirect('/', params={'found': found})
+        redirect('/', params={'correct_answer': found})
 
     @expose()
     @require(is_anonymous(msg='Only one account per user is ' \
@@ -86,21 +90,18 @@ class RootController(BaseController):
         redirect(url('/login'))
 
     @expose('trivia.templates.trivia')
-    def index(self, found = None):
+    def index(self, correct_answer = None):
         """Handle the front-page."""
-        
-        # Default the correct option
-        self.correct_option = 0
         
         if request.identity:
             generated_trivia = self.question_generator.get_question()
-            self.correct_option = generated_trivia['correct_option']
+            self.cache.put(generated_trivia)
             score =  DBSession.query(model.User).get(request.identity['user']\
                                                 .email_address).score
 
-            if found == 'True':
+            if correct_answer == 'True':
                 flash('Correct!', 'ok')
-            elif found == 'False':
+            elif correct_answer == 'False':
                 flash('Wrong!', 'error')
                                                 
             return { 'trivia': generated_trivia, 'score': score }
